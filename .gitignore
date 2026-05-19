@@ -1,0 +1,111 @@
+# =========================
+# PYTHON / DJANGO
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Django
+*.log
+db.sqlite3
+media/
+staticfiles/
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Migrations (optional)
+# Django migrations
+*/migrations/*
+!*/migrations/__init__.py
+**/migrations/*.py
+!**/migrations/__init__.py
+**/migrations/*.pyc
+
+# Pytest / Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# MyPy
+.mypy_cache/
+
+# VSCode / IDE
+.vscode/
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# =========================
+# NODE / REACT
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# React Build
+build/
+dist/
+
+# Cache
+.cache/
+.parcel-cache/
+
+# =========================
+# TYPESCRIPT
+# =========================
+*.tsbuildinfo
+
+# =========================
+# FRONTEND ENV
+# =========================
+frontend/.env
+backend/.env
+
+# =========================
+# DJANGO COLLECTSTATIC
+# =========================
+static/
+
+# =========================
+# UPLOADS
+# =========================
+uploads/
+media/
+
+# =========================
+# SQLITE
+# =========================
+*.sqlite3
+
+# =========================
+# CELERY
+# =========================
+celerybeat-schedule
+
+# =========================
+# REDIS
+# =========================
+dump.rdb
+
+# =========================
+# TEST OUTPUTS
+# =========================
+coverage.xml
+nosetests.xml
+
+# =========================
+# MAC / LINUX
+# =========================
+*.swp
+*.swo
