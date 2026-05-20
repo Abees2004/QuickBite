@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../../../components/Navbar";
 import axiosInstance from "../../../api/axiosapi";
-import { toast } from "react-toastify/unstyled";
+import { toast } from "react-toastify";
 
 const DeliveryPartnerRegister = () => {
   const [formData, setFormData] = useState({
@@ -86,6 +86,7 @@ const DeliveryPartnerRegister = () => {
         location: "",
         vehicleType: "Bike",
       });
+      
     } catch (err) {
       console.error(err);
 

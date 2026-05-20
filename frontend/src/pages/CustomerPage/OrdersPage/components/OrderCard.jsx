@@ -9,6 +9,8 @@ const OrderCard = ({ order }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'PENDING': return 'bg-yellow-100 text-yellow-700';
+      case 'PLACED': return 'bg-yellow-100 text-yellow-700';
+      case 'FAILED': return 'bg-red-100 text-red-700';
       case 'APPROVED': return 'bg-blue-100 text-blue-700';
       case 'ASSIGNED': return 'bg-indigo-100 text-indigo-700';
       case 'PICKED': return 'bg-green-100 text-green-700';

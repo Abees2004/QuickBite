@@ -16,6 +16,7 @@ from django.shortcuts import get_object_or_404
 
 from .models import DeliveryAddress
 from .serializers import DeliveryAddressSerializer
+from payment.models import Payment
 
 
 class DeliveryAddressView(generics.ListAPIView,generics.UpdateAPIView):
@@ -138,7 +139,7 @@ class OrderRequestListView(generics.ListAPIView):
         # RESTAURANT
         if user.is_staff:
             return Order.objects.filter(
-                restaurant__partner=user,status="PENDING"
+                restaurant__partner=user,status="PLACED"
             )
         return Order.objects.none()
 
@@ -161,6 +162,95 @@ class OrderStatusUpdateView(generics.UpdateAPIView):
         return Order.objects.none()
     
 
+
+
+
+import razorpay
+from django.conf import settings
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+
+class PlaceOrderView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        user = request.user
+
+        cart_items = CartItem.objects.filter(cart__customer=user)
+
+        if not cart_items.exists():
+            return Response(
+                {"error": "Cart is empty"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        restaurant = cart_items.first().cart.restaurant
+
+        try:
+            address = DeliveryAddress.objects.get(user=user)
+        except DeliveryAddress.DoesNotExist:
+            return Response(
+                {"error": "Address not found"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        total = 0
+
+        for item in cart_items:
+            total += item.food.price * item.quantity
+
+        # Razorpay amount in paisa
+        razorpay_amount = total * 100
+
+        client = razorpay.Client(
+            auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
+        )
+
+        razorpay_order = client.order.create({
+            "amount": razorpay_amount,
+            "currency": "INR",
+            "payment_capture": 1
+        })
+
+        # Create payment
+        payment = Payment.objects.create(
+            user=user,
+            amount=total,
+            razorpay_order_id=razorpay_order["id"],
+            status="PENDING"
+        )
+
+        # Create order
+        order = Order.objects.create(
+            customer=user,
+            restaurant=restaurant,
+            total=total,
+            street_name=address.street_name,
+            city=address.city,
+            pincode=address.pincode,
+            payment=payment,
+            status="PENDING"
+        )
+
+        # Create order items
+        for item in cart_items:
+            OrderItems.objects.create(
+                order=order,
+                food=item.food,
+                quantity=item.quantity,
+                price=item.food.price,
+            )
+
+        return Response({
+            "message": "Order created",
+            "order_id": order.id,
+            "razorpay_order_id": razorpay_order["id"],
+            "amount": razorpay_amount,
+            "key": settings.RAZORPAY_KEY_ID
+        })
 
 
 

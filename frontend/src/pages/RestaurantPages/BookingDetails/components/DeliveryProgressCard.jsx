@@ -1,6 +1,6 @@
 import React from 'react';
 
-const STATUS_ORDER = ['PENDING', 'APPROVED', 'ASSIGNED','PICKED' ,'DELIVERED'];
+const STATUS_ORDER = ['PENDING','PLACED', 'APPROVED', 'ASSIGNED','PICKED' ,'DELIVERED'];
 
 const TimelineStep = ({ title, subText, isActive, isLast }) => (
   <div className={`timeline-item ${isActive ? 'active' : ''} ${isLast ? 'last-item' : ''}`}>
@@ -17,6 +17,7 @@ const DeliveryProgressCard = ({ status }) => {
   const currentStatus=status
   const steps = [
     { key: 'PENDING', title: 'Pending', subText: 'Awaiting confirmation' },
+    { key: 'PLACED', title: 'Placed', subText: 'Awaiting confirmation' },
     { key: 'APPROVED', title: 'Accepted', subText: 'Restaurant is preparing' },
     { key: 'ASSIGNED', title: 'Assigned', subText: 'Rider is on the way' },
     { key: 'PICKED', title: 'PICKED', subText: 'ON the way' },
@@ -31,7 +32,7 @@ const DeliveryProgressCard = ({ status }) => {
         Order Status
       </h3>
 
-      {currentStatus=='REJECTED' &&(
+      {(currentStatus === 'REJECTED' || currentStatus === 'FAILED') && (
         <h3 className='text-2xl font-extrabold pb-2 text-red-500'>Order Rejected</h3>
       )}
       

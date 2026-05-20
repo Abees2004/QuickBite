@@ -17,13 +17,15 @@ class Order(models.Model):
 
     status_choices=[
         ('PENDING','PENDING'),
+        ('PLACES','PLACED'),
+        ('FAILED','FAILED'),
         ('APPROVED','APPROVED'),
         ('REJECTED','REJECTED'),
         ('ASSIGNED','ASSIGNED'),
         ('PICKED','PICKED'),
         ('DELIVERED','DELIVERD')
     ]
-
+    payment = models.ForeignKey("payment.Payment",on_delete=models.SET_NULL,null=True,blank=True,related_name="orders")
     customer = models.ForeignKey("users.User",on_delete=models.CASCADE,related_name='customer',db_index=True)
     restaurant = models.ForeignKey("resturants.Restaurant",on_delete=models.CASCADE,db_index=True)
     Delivery_partner = models.ForeignKey("users.User",on_delete=models.CASCADE,null=True,blank=True,

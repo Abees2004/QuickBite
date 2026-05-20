@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'users',
     'resturants',
     'products.apps.ProductsConfig',
+    'payment',
     'cart',
     'orders',
     'delivery',
@@ -75,8 +76,11 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+
+        'DIRS': [BASE_DIR / "templates"],
+
         'APP_DIRS': True,
+
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
@@ -103,6 +107,8 @@ DATABASES = {
         }
     }
 }
+
+
 
 
 # Password validation
@@ -158,6 +164,9 @@ CORS_ALLOWED_ORIGINS = [
     ]
 
 
+
+RAZORPAY_KEY_ID = config("RAZORPAY_KEY_ID")
+RAZORPAY_KEY_SECRET = config("RAZORPAY_KEY_SECRET")
 
 
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const STATUS_ORDER = ['PENDING', 'APPROVED', 'ASSIGNED', 'PICKED', 'DELIVERED'];
+const STATUS_ORDER = ['PENDING','PLACED', 'APPROVED', 'ASSIGNED', 'PICKED', 'DELIVERED'];
 
 const TimelineStep = ({ title, subText, isActive, isLast, isCompleted }) => (
   <div className="relative pl-8 pb-8 last:pb-0">
@@ -43,6 +43,7 @@ const DeliveryProgressCard = ({ status }) => {
   const currentStatus = status;
   const steps = [
     { key: 'PENDING', title: 'Pending', subText: 'Awaiting confirmation' },
+    { key: 'PLACED', title: 'Placed', subText: 'ORDER PLACED' },
     { key: 'APPROVED', title: 'Accepted', subText: 'Restaurant is preparing' },
     { key: 'ASSIGNED', title: 'Assigned', subText: 'Rider is on the way' },
     { key: 'PICKED', title: 'Picked', subText: 'Rider Picked the order' },
@@ -57,10 +58,15 @@ const DeliveryProgressCard = ({ status }) => {
         Order Status
       </h3>
 
-      {currentStatus === 'REJECTED' && (
+      {(currentStatus === 'REJECTED' || currentStatus === 'FAILED') && (
         <div className="mb-6 p-4 bg-red-50 rounded-lg">
-           <h3 className="text-xl font-extrabold text-red-600">Order Rejected</h3>
-           <p className="text-sm text-red-500">Please contact support for more details.</p>
+          <h3 className="text-xl font-extrabold text-red-600">
+            Order Rejected
+          </h3>
+
+          <p className="text-sm text-red-500">
+            Please contact support for more details.
+          </p>
         </div>
       )}
 

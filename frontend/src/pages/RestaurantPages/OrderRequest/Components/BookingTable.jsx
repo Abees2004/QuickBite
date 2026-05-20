@@ -11,6 +11,8 @@ const BookingTable = () => {
     const getStatusColor = (status) => {
         switch (status) {
             case 'PENDING': return 'text-yellow-500';
+            case 'PLACED': return 'text-yellow-500';
+            case 'FAILED': return 'text-red-500';
             case 'APPROVED': return 'text-blue-500';
             case 'ASSIGNED': return 'text-aqua-500';
             case 'PICKED': return 'text-green-500';
