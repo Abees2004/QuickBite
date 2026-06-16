@@ -41,6 +41,8 @@ class LoginView(APIView):
             status=status.HTTP_200_OK
         )
 
+
+
 class UsersListView(generics.ListAPIView):
     permission_classes=[IsAdminUser] 
     queryset=User.objects.filter(is_staff=False,is_del=False)

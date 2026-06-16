@@ -11,13 +11,7 @@ class User(AbstractUser):
     is_del = models.BooleanField(default=False,db_index=True)
     is_busy = models.BooleanField(default=False,db_index=True)
 
-    class Meta:
-        indexes = [
-            models.Index(fields=['username']),
-            models.Index(fields=['email']),
-            models.Index(fields=['is_del']),
-            models.Index(fields=['is_busy']),
-        ]
+
 
     def __str__(self):
         return self.username

@@ -38,13 +38,6 @@ class Restaurant(models.Model):
     created_at = models.DateTimeField(auto_now_add=True,db_index=True)
 
     class Meta:
-        indexes = [
-            models.Index(fields=['name']),
-            models.Index(fields=['city']),
-            models.Index(fields=['is_active']),
-            models.Index(fields=['created_at']),
-        ]
-
         ordering = ['-created_at']
 
     def __str__(self):

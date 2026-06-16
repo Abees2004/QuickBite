@@ -29,7 +29,7 @@ class FoodItemsView(generics.ListAPIView):
     def get_queryset(self):
         return FoodItem.objects.filter(
             restaurant__partner=self.request.user
-        )
+        ).select_related('category')
 
 class FoodItemAddView(generics.CreateAPIView):
     permission_classes=[IsStaffUser]
@@ -47,7 +47,7 @@ class FoodEditView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return FoodItem.objects.filter(
             restaurant__partner=self.request.user
-        )
+        ).select_related('category')
     
 
 

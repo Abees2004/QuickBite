@@ -5,11 +5,6 @@ class FoodCategory(models.Model):
     name = models.CharField(null=False,max_length=100,blank=False,db_index=True)
     status = models.BooleanField(default=True)
 
-    class Meta:
-        indexes = [
-            models.Index(fields=['name']),
-        ]
-
     def __str__(self):
         return self.name
 
@@ -27,16 +22,6 @@ class FoodItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True,db_index=True)
 
     class Meta:
-        indexes = [
-            models.Index(fields=['restaurant']),
-            models.Index(fields=['category']),
-            models.Index(fields=['status']),
-            models.Index(fields=['is_veg']),
-            models.Index(fields=['price']),
-            models.Index(fields=['created_at']),
-
-        ]
-
         ordering = ['-created_at']
 
     def __str__(self):
@@ -58,8 +43,5 @@ class RatingReview(models.Model):
         unique_together = ('user', 'restaurant')
 
         indexes = [
-            models.Index(fields=['restaurant']),
-            models.Index(fields=['user']),
-            models.Index(fields=['rating']),
             models.Index(fields=['restaurant', 'rating']),
         ]

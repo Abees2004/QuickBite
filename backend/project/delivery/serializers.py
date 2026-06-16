@@ -68,9 +68,7 @@ class OrderSerializer(ModelSerializer):
 
     def get_items(self, obj):
 
-        items = obj.orderitems_set.select_related(
-            'food'
-        )
+        items = obj.orderitems_set.all()
 
         return OrderItemSerializer(
             items,

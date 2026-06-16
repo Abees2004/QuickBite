@@ -7,16 +7,14 @@ from rest_framework.views import APIView,Response,status
 from django.shortcuts import get_object_or_404
 from cart.models import Cart,CartItem
 from django.db.models import Sum, Avg, Count
-
-# Create your views here.
-
-from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-
 from .models import DeliveryAddress
 from .serializers import DeliveryAddressSerializer
 from payment.models import Payment
+import razorpay
+from django.conf import settings
+
+
 
 
 class DeliveryAddressView(generics.ListAPIView,generics.UpdateAPIView):
@@ -34,44 +32,6 @@ class DeliveryAddressView(generics.ListAPIView,generics.UpdateAPIView):
             user=self.request.user
         )
 
-class PlaceOrderView(APIView):
-    permission_classes=[IsAuthenticated]
-    def post(self, request):
-        user_object = self.request.user
-        cart_items_list = CartItem.objects.filter(cart__customer=user_object)
-        if not cart_items_list.exists():
-            return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
-        restaurant = cart_items_list.first().cart.restaurant
-        address = DeliveryAddress.objects.get(user=2)
-        total = 0
-        for item in cart_items_list:
-            total += item.food.price * item.quantity
-
-        order = Order.objects.create(
-            customer=user_object,
-            restaurant=restaurant,
-            total=total,
-            street_name=address.street_name,
-            city=address.city,
-            pincode=address.pincode
-        )
-
-        for item in cart_items_list:
-            OrderItems.objects.create(
-                order=order,
-                food=item.food,
-                quantity=item.quantity,
-                price=item.food.price,
-            )
-
-        cart_items_list.delete()
-
-        user_cart = Cart.objects.get(customer=user_object)
-        user_cart.restaurant = None
-        user_cart.save()
-
-        return Response({'message': 'Order placed successfully'}, status=status.HTTP_200_OK)
-
 class OrderListView(generics.ListAPIView):
     permission_classes=[IsAuthenticated]
 
@@ -81,21 +41,25 @@ class OrderListView(generics.ListAPIView):
 
         user = self.request.user
         if user.is_superuser:
-            return Order.objects.all()
+            queryset = Order.objects.all()
         
         elif user.is_staff:
-            return Order.objects.filter(
+            queryset = Order.objects.filter(
                 restaurant__partner=user
             )
 
-
         elif user.is_active:
-            return Order.objects.filter(
+            queryset = Order.objects.filter(
                 customer=user
             )
+        else:
+            return Order.objects.none()
 
-
-        return Order.objects.none()
+        return queryset.select_related(
+            'customer', 'restaurant', 'Delivery_partner'
+        ).prefetch_related(
+            'orderitems_set__food'
+        )
 
 class OrderDetailsView(generics.RetrieveAPIView):
     permission_classes=[IsAuthenticated]
@@ -108,25 +72,27 @@ class OrderDetailsView(generics.RetrieveAPIView):
 
         # ADMIN
         if user.is_superuser:
-            return Order.objects.all()
+            queryset = Order.objects.all()
 
         # RESTAURANT
         elif user.is_staff:
-            return Order.objects.filter(
+            queryset = Order.objects.filter(
                 restaurant__partner=user
             )
-
-
         
         # CUSTOMER
         elif user.is_active:
-            return Order.objects.filter(
+            queryset = Order.objects.filter(
                 customer=user
             )
+        else:
+            return Order.objects.none()
 
-
-
-        return Order.objects.none()
+        return queryset.select_related(
+            'customer', 'restaurant', 'Delivery_partner'
+        ).prefetch_related(
+            'orderitems_set__food'
+        )
 
 class OrderRequestListView(generics.ListAPIView):
     permission_classes=[IsAuthenticated]
@@ -139,7 +105,11 @@ class OrderRequestListView(generics.ListAPIView):
         # RESTAURANT
         if user.is_staff:
             return Order.objects.filter(
-                restaurant__partner=user,status="PLACED"
+                restaurant__partner=user, status="PLACED"
+            ).select_related(
+                'customer', 'restaurant', 'Delivery_partner'
+            ).prefetch_related(
+                'orderitems_set__food'
             )
         return Order.objects.none()
 
@@ -165,12 +135,7 @@ class OrderStatusUpdateView(generics.UpdateAPIView):
 
 
 
-import razorpay
-from django.conf import settings
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
+
 
 class PlaceOrderView(APIView):
     permission_classes = [IsAuthenticated]
@@ -179,7 +144,7 @@ class PlaceOrderView(APIView):
 
         user = request.user
 
-        cart_items = CartItem.objects.filter(cart__customer=user)
+        cart_items = CartItem.objects.filter(cart__customer=user).select_related('food', 'cart__restaurant')
 
         if not cart_items.exists():
             return Response(
@@ -187,7 +152,7 @@ class PlaceOrderView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        restaurant = cart_items.first().cart.restaurant
+        restaurant = cart_items[0].cart.restaurant
 
         try:
             address = DeliveryAddress.objects.get(user=user)

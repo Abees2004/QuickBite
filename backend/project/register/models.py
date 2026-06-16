@@ -25,11 +25,6 @@ class PartnerRegister(models.Model):
         db_index=True
     )
 
-    class Meta:
-        indexes = [
-            models.Index(fields=['status']),
-        ]
-
     def __str__(self):
         return f"{self.partner} status {self.status}"
     
@@ -62,12 +57,6 @@ class DeliveryPartnerRegister(models.Model):
         default='PENDING',
         db_index=True
     )
-
-    class Meta:
-        indexes = [
-            models.Index(fields=['status']),
-            models.Index(fields=['delivery_partner']),
-        ]
 
     def __str__(self):
         return f'Delivery partner {self.delivery_partner} status {self.status}'

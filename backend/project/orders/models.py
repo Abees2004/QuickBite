@@ -7,11 +7,6 @@ class DeliveryAddress(models.Model):
     pincode = models.IntegerField(null=True,blank=True)
     city = models.CharField(max_length=255,null=True,blank=True)
 
-    class Meta:
-        indexes = [
-            models.Index(fields=['user']),
-        ]
-
 
 class Order(models.Model):
 
@@ -39,11 +34,9 @@ class Order(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=['customer']),
-            models.Index(fields=['restaurant']),
-            models.Index(fields=['Delivery_partner']),
-            models.Index(fields=['status']),
-            models.Index(fields=['creadted_at']),
+            models.Index(fields=['customer', '-creadted_at']),
+            models.Index(fields=['restaurant', '-creadted_at']),
+            models.Index(fields=['Delivery_partner', '-creadted_at']),
         ]
 
         ordering = ['-creadted_at']
@@ -61,7 +54,5 @@ class OrderItems(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=['order']),
-            models.Index(fields=['food']),
             models.Index(fields=['order', 'food']),
         ]

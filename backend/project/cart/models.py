@@ -11,8 +11,6 @@ class Cart(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=['customer']),
-            models.Index(fields=['restaurant']),
             models.Index(fields=['customer', 'restaurant']),
         ]
 
@@ -28,8 +26,6 @@ class CartItem(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=['cart']),
-            models.Index(fields=['food']),
             models.Index(fields=['cart', 'food']),
         ]
 

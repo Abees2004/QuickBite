@@ -24,9 +24,15 @@ class RestaurantsListSerializer(ModelSerializer):
         fields=['id','partner','name','image','street_name','city','pincode','is_active','min_price','rating']
     
     def get_min_price(self,obj):
+        annotated_min = getattr(obj, 'annotated_min_price', None)
+        if annotated_min is not None:
+            return {'price__min': annotated_min}
         return(FoodItem.objects.filter(restaurant=obj).aggregate(Min('price'))) 
       
     def get_rating(self, obj):
+        rating = getattr(obj, 'annotated_rating', None)
+        if rating is not None:
+            return round(rating, 1) if rating else 0
         rating = RatingReview.objects.filter(restaurant=obj).aggregate(Avg('rating'))['rating__avg']
         return round(rating, 1) if rating else 0     
 
@@ -37,6 +43,9 @@ class RestaurantsSerializer(ModelSerializer):
         fields="__all__"
 
     def get_rating(self, obj):
+        rating = getattr(obj, 'annotated_rating', None)
+        if rating is not None:
+            return round(rating, 1) if rating else 0
         rating = RatingReview.objects.filter(restaurant=obj).aggregate(Avg('rating'))['rating__avg']
         return round(rating, 1) if rating else 0
     

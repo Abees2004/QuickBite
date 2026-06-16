@@ -72,9 +72,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def get_items(self, obj):
 
-        items = obj.orderitems_set.select_related(
-            'food'
-        )
+        items = obj.orderitems_set.all()
 
         return OrderItemSerializer(
             items,
@@ -83,12 +81,11 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
 
-        item = obj.orderitems_set.select_related(
-            'food'
-        ).first()
-
-        if item and item.food.image:
-            return item.food.image.url
+        items = list(obj.orderitems_set.all())
+        if items:
+            item = items[0]
+            if item.food.image:
+                return item.food.image.url
 
         return None
 

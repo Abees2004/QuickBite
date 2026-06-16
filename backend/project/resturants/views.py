@@ -76,7 +76,6 @@ class RestaurantDashboardView(APIView):
 
 class RestaurantsListView(generics.ListAPIView):
     permission_classes=[AllowAny] 
-    queryset=Restaurant.objects.filter(is_active=True)
     serializer_class=RestaurantsListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_class = RestaurantFilter
@@ -87,6 +86,27 @@ class RestaurantsListView(generics.ListAPIView):
         'fooditem__name',
         'fooditem__category__name',
     ]
+
+    def get_queryset(self):
+        from django.db.models import Subquery, OuterRef, Min, Avg
+        from products.models import FoodItem
+
+        min_price_subquery = FoodItem.objects.filter(
+            restaurant=OuterRef('pk')
+        ).values('restaurant').annotate(
+            min_val=Min('price')
+        ).values('min_val')
+
+        rating_subquery = RatingReview.objects.filter(
+            restaurant=OuterRef('pk')
+        ).values('restaurant').annotate(
+            avg_rating=Avg('rating')
+        ).values('avg_rating')
+
+        return Restaurant.objects.filter(is_active=True).annotate(
+            annotated_min_price=Subquery(min_price_subquery),
+            annotated_rating=Subquery(rating_subquery)
+        )
 
 
 class RestaurantParticularView(generics.RetrieveAPIView):
@@ -110,7 +130,7 @@ class FoodRatingsView(generics.ListAPIView):
     serializer_class=FoodRatingSerializer
     def get_queryset(self):
         restaurant_id = self.kwargs['restaurant_id']
-        return RatingReview.objects.filter(restaurant_id=restaurant_id)
+        return RatingReview.objects.filter(restaurant_id=restaurant_id).select_related('user')
     
 class CustomerFoodRatingView(APIView):
     permission_classes = [IsAuthenticated]

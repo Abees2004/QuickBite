@@ -13,7 +13,7 @@ class CartView(generics.ListAPIView):
     permission_classes=[IsAuthenticated]
     def get_queryset(self):
         user = self.request.user
-        return CartItem.objects.filter(cart__customer=user)
+        return CartItem.objects.filter(cart__customer=user).select_related('food', 'food__category')
     
 
 class CartFoodAddView(generics.CreateAPIView):

@@ -19,6 +19,8 @@ class AvailableOrdersView(generics.ListAPIView):
             'restaurant',
             'customer',
             'Delivery_partner'
+        ).prefetch_related(
+            'orderitems_set__food'
         )
     
 class AssignOrderView(generics.UpdateAPIView):
@@ -39,7 +41,10 @@ class DeliveryPartnerOrdersView(generics.ListAPIView):
             Delivery_partner=self.request.user
         ).select_related(
             'restaurant',
-            'customer'
+            'customer',
+            'Delivery_partner'
+        ).prefetch_related(
+            'orderitems_set__food'
         )
 
 
@@ -53,7 +58,10 @@ class DeliveryPartnerSingleOrderView(generics.RetrieveAPIView):
             Delivery_partner=self.request.user
         ).select_related(
             'restaurant',
-            'customer'
+            'customer',
+            'Delivery_partner'
+        ).prefetch_related(
+            'orderitems_set__food'
         )
 
     
@@ -67,6 +75,12 @@ class ActiveDeliveryOrdersView(generics.ListAPIView):
         return Order.objects.filter(
             Delivery_partner=self.request.user,
             status__in=['ASSIGNED', 'PICKED']
+        ).select_related(
+            'restaurant',
+            'customer',
+            'Delivery_partner'
+        ).prefetch_related(
+            'orderitems_set__food'
         )
     
 class DeliveredOrdersView(generics.ListAPIView):
@@ -78,6 +92,12 @@ class DeliveredOrdersView(generics.ListAPIView):
         return Order.objects.filter(
             Delivery_partner=self.request.user,
             status='DELIVERED'
+        ).select_related(
+            'restaurant',
+            'customer',
+            'Delivery_partner'
+        ).prefetch_related(
+            'orderitems_set__food'
         )
     
 class DeliveryStatusUpdateView(generics.UpdateAPIView):

@@ -22,20 +22,20 @@ class DeliveryPartnerRegisterView(generics.CreateAPIView):
 
 class PartnerRequestListView(generics.ListAPIView):
     permission_classes=[IsAdminUser]
-    queryset=PartnerRegister.objects.filter(status="PENDING")
+    queryset=PartnerRegister.objects.filter(status="PENDING").select_related('partner')
     serializer_class=PartnerApproveSerializer
 
 class PartnerApproveView(generics.RetrieveUpdateAPIView):
     permission_classes=[IsAdminUser]
-    queryset=PartnerRegister.objects.filter(status="PENDING")
+    queryset=PartnerRegister.objects.filter(status="PENDING").select_related('partner')
     serializer_class=PartnerApproveSerializer
 
 class DeliveryPartnerRequestListView(generics.ListAPIView):
     permission_classes=[IsAdminUser]
-    queryset=DeliveryPartnerRegister.objects.filter(status="PENDING")
+    queryset=DeliveryPartnerRegister.objects.filter(status="PENDING").select_related('delivery_partner')
     serializer_class=DeliveryPartnerApproveSerializer
 
 class DeliveryPartnerApproveView(generics.RetrieveUpdateAPIView):
     permission_classes=[IsAdminUser]
-    queryset=DeliveryPartnerRegister.objects.filter(status="PENDING")
+    queryset=DeliveryPartnerRegister.objects.filter(status="PENDING").select_related('delivery_partner')
     serializer_class=DeliveryPartnerApproveSerializer
